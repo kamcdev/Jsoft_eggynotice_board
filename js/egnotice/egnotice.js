@@ -153,9 +153,43 @@
     };
   }
 
-  
+
+  function onDocKeydown(e) {
+    if (e.key === 'Escape' && root) close();
+  }
+
+  function onWinResize() {
+    applyScale();
+  }
+
+  function onImgLoad(e) {
+    if (e.target && e.target.tagName === 'IMG' && root && root.contains(e.target)) {
+      syncScrollbar();
+    }
+  }
+
+  function detachListeners() {
+    document.removeEventListener('keydown', onDocKeydown);
+    document.removeEventListener('load', onImgLoad, true);
+    window.removeEventListener('resize', onWinResize);
+  }
+
+  function resetState() {
+    root = null;
+    currentIndex = 0;
+    spyLock = false;
+    leadBlocks = 0;
+  }
+
   function buildBoard() {
-    if (root) return;
+    
+    if (root) {
+      
+      if (document.body && document.body.contains(root)) return;
+      
+      detachListeners();
+      resetState();
+    }
 
     root = document.createElement('div');
     root.id = ROOT_ID;
@@ -219,11 +253,9 @@
       if (e.target === root) close();
     });
 
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && root && !root.classList.contains('hidden')) close();
-    });
+    document.addEventListener('keydown', onDocKeydown);
 
-    
+
     tabs.addEventListener('click', function (e) {
       var el = e.target;
       while (el && el !== tabs) {
@@ -235,18 +267,14 @@
       }
     });
 
-    
+
     scroll.addEventListener('scroll', onScroll);
 
-    
-    document.addEventListener('load', function (e) {
-      if (e.target && e.target.tagName === 'IMG' && root.contains(e.target)) {
-        syncScrollbar();
-      }
-    }, true);
 
-    
-    window.addEventListener('resize', applyScale);
+    document.addEventListener('load', onImgLoad, true);
+
+
+    window.addEventListener('resize', onWinResize);
 
     root._dialog = dialog;
 
@@ -514,10 +542,17 @@
     applyScale();
   }
 
-  
+
   function close() {
     if (!root) return;
-    root.classList.add('hidden');
+
+    detachListeners();
+
+    if (root.parentNode) {
+      root.parentNode.removeChild(root);
+    }
+    resetState();
+
     if (typeof config.onClose === 'function') {
       try { config.onClose(); } catch (e) { console.warn(e); }
     }

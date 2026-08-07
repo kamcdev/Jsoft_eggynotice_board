@@ -36,6 +36,8 @@
 
 支持多分类页签、滚动联动、自定义滚动条、富文本颜色与链接、屏幕缩放适配
 
+公告板由 JS 动态注入页面 DOM，页面无需预留任何 HTML 结构，只需引入 CSS 与 JS 即可；关闭时自动从 DOM 移除公告板元素并释放事件监听，可反复打开关闭而不产生残留
+
 <p id="部署"></p>
 
 ------
@@ -78,7 +80,7 @@ python -m http.server 8080
 
 3.集成到你的页面
 
-在你的 HTML 中引入样式与脚本：
+在你的 HTML 中引入样式与脚本即可，**无需在页面中书写任何公告板 HTML 结构**，公告板 DOM 会在调用打开方法时由 JS 动态创建并注入到 `document.body`：
 
 ```html
 <link rel="stylesheet" href="css/egnotice/egnotice.css">
@@ -165,7 +167,7 @@ content 中的富文本标记：
 | `EgNotice.open(url, options?)` | 从 JSON 文件路径加载公告并弹出，返回 Promise |
 | `EgNotice.render(data, options?)` | 直接传入公告数据数组渲染并弹出 |
 | `EgNotice.init(options?)` | 初始化配置，设置 `url` 且 `autoOpen` 不为 false 时自动弹出 |
-| `EgNotice.close()` | 关闭公告板 |
+| `EgNotice.close()` | 关闭公告板，并从 DOM 中移除公告板元素、释放事件监听 |
 
 配置项（options）：
 
