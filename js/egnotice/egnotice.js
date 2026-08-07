@@ -7,7 +7,7 @@
 
   var DEFAULTS = {
     assetsBase: 'css/egnotice/',
-    firstTabTitle: '维护公告',
+    firstTabTitle: '请添加节目',
     mainTitle: '',
     autoOpen: true,
     onClose: null
