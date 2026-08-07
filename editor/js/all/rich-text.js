@@ -16,7 +16,7 @@
     { id: 'strike', name: '中划线', params: [{ name: '颜色', type: 'color' }], format: 'h:{颜色}', end: false, image: false },
     { id: 'underline', name: '下划线', params: [{ name: '颜色', type: 'color' }], format: 'u:{颜色}', end: false, image: false },
     { id: 'end', name: '结束富文本', params: [], format: '#l', end: true, image: false },
-    { id: 'image', name: '插入图片', params: [{ name: '内部路径', type: 'text' }, { name: '大小', type: 'number' }], format: '#p(f:{内部路径}|s:{大小})', end: false, image: true }
+    { id: 'image', name: '插入图片', params: [{ name: 'url', type: 'text' }, { name: '大小', type: 'number' }], format: '#p(f:{url}|s:{大小})', end: false, image: true }
   ];
 
   // 根据 id 查找样式定义

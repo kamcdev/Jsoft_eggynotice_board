@@ -55,45 +55,24 @@
     if (s.charAt(0) === '#' && s.charAt(1) === 'c') {
       s = '#' + s.substring(2);
     }
+    if (s.charAt(0) !== '#' && /^[0-9a-fA-F]{6}$/.test(s)) {
+      s = '#' + s;
+    }
     return /^#[0-9a-fA-F]{6}$/.test(s) ? s : '#000000';
   }
 
-  
-  function extractParam(params, key) {
-    if (!params) return null;
-    var pairs = String(params).split('|');
+
+
+  function parseStyleParams(paramStr) {
+    var params = {};
+    var pairs = String(paramStr || '').split('|');
     for (var i = 0; i < pairs.length; i++) {
       var idx = pairs[i].indexOf(':');
-      if (idx > 0 && pairs[i].substring(0, idx) === key) {
-        return pairs[i].substring(idx + 1);
+      if (idx > 0) {
+        params[pairs[i].substring(0, idx)] = pairs[i].substring(idx + 1);
       }
     }
-    return null;
-  }
-
-  
-
-  
-  function parseColoredSegments(text) {
-    var segments = [];
-    if (!text) return segments;
-    var regex = /#c([0-9a-fA-F]{6})/g;
-    var currentColor = '#000000';
-    var lastEnd = 0;
-    var match;
-    while ((match = regex.exec(text)) !== null) {
-      if (match.index > lastEnd) {
-        var content = text.substring(lastEnd, match.index).trim();
-        if (content) segments.push({ text: content, color: currentColor });
-      }
-      currentColor = '#' + match[1];
-      lastEnd = regex.lastIndex;
-    }
-    if (lastEnd < text.length) {
-      var tail = text.substring(lastEnd).trim();
-      if (tail) segments.push({ text: tail, color: currentColor });
-    }
-    return segments;
+    return params;
   }
 
   function makeTextSpan(text, color) {
@@ -103,40 +82,196 @@
     return span;
   }
 
-  
-  function buildRichText(text) {
-    var frag = document.createDocumentFragment();
-    var segments = parseColoredSegments(text);
-    var linkRegex = /#f\(([^)]*)\)(.*?)#l/g;
+  function buildOutlineShadow(color, size) {
+    var s = size || 1;
+    var c = parseColor(color);
+    var d = (s * 0.7).toFixed(1);
+    return [
+      s + 'px 0 0 ' + c, '-' + s + 'px 0 0 ' + c,
+      '0 ' + s + 'px 0 ' + c, '0 -' + s + 'px 0 ' + c,
+      d + 'px ' + d + 'px 0 ' + c, '-' + d + 'px ' + d + 'px 0 ' + c,
+      d + 'px -' + d + 'px 0 ' + c, '-' + d + 'px -' + d + 'px 0 ' + c
+    ];
+  }
 
-    for (var i = 0; i < segments.length; i++) {
-      var seg = segments[i];
-      var segText = seg.text;
-      var segColor = seg.color;
-      linkRegex.lastIndex = 0;
-      var m;
-      var lastEnd = 0;
-      while ((m = linkRegex.exec(segText)) !== null) {
-        if (m.index > lastEnd) {
-          frag.appendChild(makeTextSpan(segText.substring(lastEnd, m.index), segColor));
-        }
-        var linkText = m[2];
-        var colorStr = extractParam(m[1], 'c');
-        var linkColor = colorStr ? parseColor('#' + colorStr) : segColor;
-        var a = document.createElement('a');
-        a.className = 'egnotice-link';
-        a.href = linkText;
-        a.target = '_blank';
-        a.rel = 'noopener';
-        a.style.color = linkColor;
-        a.appendChild(document.createTextNode(linkText));
-        frag.appendChild(a);
-        lastEnd = linkRegex.lastIndex;
-      }
-      if (lastEnd < segText.length) {
-        frag.appendChild(makeTextSpan(segText.substring(lastEnd), segColor));
+  function buildGlowShadow(color, size) {
+    var s = parseInt(size, 10) || 5;
+    var c = parseColor(color);
+    return [
+      '0 0 ' + s + 'px ' + c,
+      '0 0 ' + (s * 2) + 'px ' + c,
+      '0 0 ' + (s * 3) + 'px ' + c
+    ];
+  }
+
+  function isUrl(text) {
+    return /^(https?:\/\/|www\.)/i.test(text.trim());
+  }
+
+  function applyStyles(el, params, parentColor) {
+    var color = params.c ? parseColor(params.c) : parentColor;
+    el.style.color = color;
+
+    if (params.s) {
+      var sz = parseInt(params.s, 10);
+      if (sz > 0) el.style.fontSize = sz + 'px';
+    }
+
+    var shadows = [];
+    if (params.o) {
+      shadows = shadows.concat(buildOutlineShadow(params.o, parseInt(params.O, 10) || 1));
+    }
+    if (params.g) {
+      shadows = shadows.concat(buildGlowShadow(params.g, params.G));
+    }
+    if (shadows.length) {
+      el.style.textShadow = shadows.join(', ');
+    }
+
+    if (params.y) {
+      var yo = parseInt(params.Y, 10) || 2;
+      el.style.filter = 'drop-shadow(' + yo + 'px ' + yo + 'px 0 ' + parseColor(params.y) + ')';
+    }
+
+    var decos = [];
+    if (params.h) {
+      decos.push('line-through');
+    }
+    if (params.u) {
+      decos.push('underline');
+    }
+    if (decos.length) {
+      el.style.textDecoration = decos.join(' ');
+      el.style.textDecorationColor = parseColor(params.u || params.h);
+    }
+  }
+
+  function buildStyledSpan(innerText, params, parentColor) {
+    var color = params.c ? parseColor(params.c) : parentColor;
+
+    var el;
+    if (isUrl(innerText)) {
+      el = document.createElement('a');
+      el.className = 'egnotice-link';
+      el.href = innerText.trim();
+      el.target = '_blank';
+      el.rel = 'noopener';
+    } else {
+      el = document.createElement('span');
+      el.className = 'egnotice-styled';
+    }
+
+    applyStyles(el, params, color);
+    el.appendChild(buildRichText(innerText, color));
+    return el;
+  }
+
+  function buildInlineImage(params) {
+    var img = document.createElement('img');
+    img.className = 'egnotice-inline-img';
+    img.alt = '';
+    if (params.f) {
+      img.src = assetUrl(params.f);
+    }
+    if (params.s) {
+      var size = parseInt(params.s, 10);
+      if (size > 0) {
+        img.style.width = size + 'px';
+        img.style.height = 'auto';
       }
     }
+    img.onerror = function () { this.style.display = 'none'; };
+    return img;
+  }
+
+  function findNextMarker(str, from) {
+    var candidates = [];
+    var idx;
+
+    idx = str.indexOf('#l', from);
+    if (idx !== -1) candidates.push(idx);
+
+    idx = str.indexOf('#f(', from);
+    if (idx !== -1) candidates.push(idx);
+
+    idx = str.indexOf('#p(', from);
+    if (idx !== -1) candidates.push(idx);
+
+    var colorRe = /#c[0-9a-fA-F]{6}/g;
+    colorRe.lastIndex = from;
+    var cm = colorRe.exec(str);
+    if (cm) candidates.push(cm.index);
+
+    if (!candidates.length) return -1;
+    return Math.min.apply(null, candidates);
+  }
+
+  function buildRichText(text, initialColor) {
+    var frag = document.createDocumentFragment();
+    if (!text) return frag;
+
+    var str = String(text);
+    var len = str.length;
+    var currentColor = initialColor || '#000000';
+    var i = 0;
+    var buffer = '';
+
+    function flushBuffer() {
+      if (buffer) {
+        frag.appendChild(makeTextSpan(buffer, currentColor));
+        buffer = '';
+      }
+    }
+
+    while (i < len) {
+      if (str.charAt(i) === '#' && str.charAt(i + 1) === 'c' &&
+          /^[0-9a-fA-F]{6}$/.test(str.substring(i + 2, i + 8))) {
+        flushBuffer();
+        currentColor = '#' + str.substring(i + 2, i + 8);
+        i += 8;
+        continue;
+      }
+
+      if (str.charAt(i) === '#' && str.charAt(i + 1) === 'f' && str.charAt(i + 2) === '(') {
+        var closeParen = str.indexOf(')', i + 3);
+        if (closeParen !== -1) {
+          flushBuffer();
+          var params = parseStyleParams(str.substring(i + 3, closeParen));
+          var endIdx = findNextMarker(str, closeParen + 1);
+          var innerText;
+          if (endIdx !== -1) {
+            innerText = str.substring(closeParen + 1, endIdx);
+            i = endIdx;
+          } else {
+            innerText = str.substring(closeParen + 1);
+            i = len;
+          }
+          frag.appendChild(buildStyledSpan(innerText, params, currentColor));
+          continue;
+        }
+      }
+
+      if (str.charAt(i) === '#' && str.charAt(i + 1) === 'p' && str.charAt(i + 2) === '(') {
+        var imgClose = str.indexOf(')', i + 3);
+        if (imgClose !== -1) {
+          flushBuffer();
+          var imgParams = parseStyleParams(str.substring(i + 3, imgClose));
+          frag.appendChild(buildInlineImage(imgParams));
+          i = imgClose + 1;
+          continue;
+        }
+      }
+
+      if (str.charAt(i) === '#' && str.charAt(i + 1) === 'l') {
+        i += 2;
+        continue;
+      }
+
+      buffer += str.charAt(i);
+      i++;
+    }
+
+    flushBuffer();
     return frag;
   }
 
