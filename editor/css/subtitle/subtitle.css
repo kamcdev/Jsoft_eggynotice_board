@@ -1,0 +1,154 @@
+/* ============================================================
+   公告创建器 - 子标题编辑页样式 (subtitle.css)
+   负责:子标题名称编辑、正文编辑、富文本快捷插入面板样式
+   依赖:all.css (通用类与 CSS 变量)
+   ============================================================ */
+
+/* ---------- 页面容器 ---------- */
+.subtitle-page {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 100%;
+  overflow: auto;
+}
+
+/* ---------- 名称区 ---------- */
+.subtitle-name-section {
+  background: #fff;
+  border: 1px solid var(--editor-border);
+  border-radius: 6px;
+  padding: 16px;
+}
+
+/* ---------- 正文编辑区 ---------- */
+.subtitle-editor-section {
+  background: #fff;
+  border: 1px solid var(--editor-border);
+  border-radius: 6px;
+  padding: 16px;
+}
+
+.subtitle-textarea {
+  width: 100%;
+  min-height: 250px;
+  font-family: monospace;
+  font-size: 13px;
+  padding: 8px;
+  border: 1px solid var(--editor-border);
+  border-radius: 4px;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.subtitle-save-hint {
+  font-size: 11px;
+  color: #888;
+  margin-top: 4px;
+}
+
+/* ---------- 富文本面板区 ---------- */
+.subtitle-richtext-section {
+  background: #fff;
+  border: 1px solid var(--editor-border);
+  border-radius: 6px;
+  padding: 16px;
+}
+
+.richtext-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+/* ---------- 富文本卡片 ---------- */
+.richtext-card {
+  border: 1px solid var(--editor-border);
+  border-radius: 6px;
+  padding: 10px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  background: #fff;
+}
+
+.richtext-card:hover {
+  border-color: var(--editor-accent);
+}
+
+.richtext-card.checked {
+  border-color: var(--editor-accent);
+  background: #f0f7ff;
+}
+
+.richtext-card.disabled {
+  opacity: 0.45;
+}
+
+.richtext-card-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.richtext-card-check {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.richtext-card-name {
+  font-size: 13px;
+  font-weight: 600;
+  flex: 1;
+}
+
+.richtext-card-params {
+  font-size: 11px;
+  color: #888;
+  margin-top: 6px;
+}
+
+/* ---------- 参数输入区 (仅选中时显示) ---------- */
+.richtext-card-param-area {
+  margin-top: 8px;
+  display: none;
+}
+
+.richtext-card.checked .richtext-card-param-area {
+  display: block;
+}
+
+.richtext-param-group {
+  margin-bottom: 6px;
+}
+
+.richtext-param-group label {
+  display: block;
+  font-size: 11px;
+  color: #666;
+  margin-bottom: 2px;
+}
+
+.richtext-param-group input {
+  width: 100%;
+  padding: 4px 6px;
+  border: 1px solid var(--editor-border);
+  border-radius: 3px;
+  font-size: 12px;
+  box-sizing: border-box;
+}
+
+.richtext-param-group input[type="color"] {
+  height: 28px;
+  cursor: pointer;
+  padding: 2px;
+}
+
+/* ---------- 操作按钮区 ---------- */
+.richtext-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+}

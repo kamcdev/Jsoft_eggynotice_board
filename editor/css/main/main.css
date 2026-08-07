@@ -1,0 +1,56 @@
+/* ============================================================
+   公告创建器 - 主标签页样式 (main.css)
+   依赖: all.css 中的通用类 (.editor-layout-split / .editor-btn 等)
+   ============================================================ */
+
+/* ---------- 主编辑区 ---------- */
+.main-edit-area {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- 按钮栏 (复用 .editor-btn-group) ---------- */
+.main-btn-group {
+  flex-shrink: 0;
+}
+
+/* ---------- 栏目列表 ---------- */
+.main-column-list {
+  flex: 1;
+  overflow: auto;
+}
+
+/* ---------- 空状态提示 ---------- */
+.main-empty-hint {
+  text-align: center;
+  color: #999;
+  padding: 40px 0;
+  font-size: 14px;
+}
+
+/* ---------- JSON 输出区 ---------- */
+.main-output-area {
+  display: flex;
+  flex-direction: column;
+}
+
+.main-output-title {
+  flex-shrink: 0;
+  margin-top: 0;
+}
+
+#editor-json-output {
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 12px;
+  white-space: pre-wrap;
+  word-break: break-all;
+  background: #1e1e1e;
+  color: #d4d4d4;
+  padding: 12px;
+  border-radius: 4px;
+  min-height: 100%;
+  overflow: auto;
+  margin: 0;
+  flex: 1;
+}

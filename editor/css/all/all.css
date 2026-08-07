@@ -1,0 +1,336 @@
+/* ============================================================
+   公告创建器 - 通用样式 (all.css)
+   纯原生 CSS,无第三方依赖
+   ============================================================ */
+
+/* ---------- 全局重置 ---------- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+  background: var(--editor-bg);
+  color: #333;
+}
+
+/* ---------- CSS 变量 ---------- */
+:root {
+  --editor-bg: #f0f0f0;
+  --editor-tabbar-bg: #2b2b2b;
+  --editor-tab-bg: #3a3a3a;
+  --editor-tab-active: #f0f0f0;
+  --editor-tab-text: #ddd;
+  --editor-tab-active-text: #333;
+  --editor-accent: #4a90d9;
+  --editor-border: #ccc;
+}
+
+/* ---------- 标签栏 ---------- */
+#editor-tabbar {
+  display: flex;
+  flex-direction: row;
+  background: var(--editor-tabbar-bg);
+  height: 38px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  align-items: stretch;
+  flex-shrink: 0;
+}
+
+#editor-tabbar::-webkit-scrollbar {
+  height: 6px;
+}
+#editor-tabbar::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 3px;
+}
+
+.editor-tab {
+  display: inline-flex;
+  align-items: center;
+  min-width: 140px;
+  max-width: 200px;
+  padding: 0 8px;
+  height: 100%;
+  cursor: pointer;
+  color: var(--editor-tab-text);
+  background: var(--editor-tab-bg);
+  border-right: 1px solid #555;
+  position: relative;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.editor-tab.active {
+  background: var(--editor-tab-active);
+  color: var(--editor-tab-active-text);
+}
+
+.editor-tab-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+}
+
+.editor-tab-close {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  font-size: 14px;
+  color: #999;
+  line-height: 1;
+  user-select: none;
+}
+
+.editor-tab-close:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+/* 主标签不可关闭 */
+.editor-tab.main .editor-tab-close {
+  display: none;
+}
+
+/* ---------- 内容区 ---------- */
+#editor-content {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.editor-page {
+  position: absolute;
+  inset: 0;
+  overflow: auto;
+  display: none;
+}
+
+.editor-page.active {
+  display: flex;
+}
+
+/* ---------- 分栏布局 ---------- */
+.editor-layout-split {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+@media (min-width: 900px) {
+  .editor-layout-split {
+    flex-direction: row;
+  }
+}
+
+@media (max-width: 899px) {
+  .editor-layout-split {
+    flex-direction: column;
+  }
+}
+
+.editor-layout-split > .editor-edit-area {
+  flex: 1;
+  overflow: auto;
+  padding: 16px;
+  min-width: 0;
+}
+
+.editor-layout-split > .editor-output-area {
+  flex: 1;
+  overflow: auto;
+  padding: 16px;
+  min-width: 0;
+}
+
+@media (min-width: 900px) {
+  .editor-layout-split > .editor-output-area {
+    border-left: 1px solid var(--editor-border);
+  }
+}
+
+@media (max-width: 899px) {
+  .editor-layout-split > .editor-output-area {
+    border-top: 1px solid var(--editor-border);
+  }
+}
+
+/* ---------- 通用按钮 ---------- */
+.editor-btn {
+  padding: 6px 14px;
+  border: 1px solid var(--editor-border);
+  background: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #333;
+  line-height: normal;
+}
+
+.editor-btn:hover {
+  border-color: var(--editor-accent);
+}
+
+.editor-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.editor-btn-primary {
+  background: var(--editor-accent);
+  color: #fff;
+  border-color: var(--editor-accent);
+}
+
+.editor-btn-primary:hover {
+  border-color: var(--editor-accent);
+  opacity: 0.9;
+}
+
+.editor-btn-danger {
+  background: #e74c3c;
+  color: #fff;
+  border-color: #e74c3c;
+}
+
+.editor-btn-danger:hover {
+  border-color: #e74c3c;
+  opacity: 0.9;
+}
+
+/* ---------- 通用输入控件 ---------- */
+.editor-input,
+.editor-select,
+.editor-textarea {
+  padding: 6px 8px;
+  border: 1px solid var(--editor-border);
+  border-radius: 4px;
+  font-size: 13px;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.editor-input:focus,
+.editor-select:focus,
+.editor-textarea:focus {
+  outline: none;
+  border-color: var(--editor-accent);
+}
+
+.editor-textarea {
+  font-family: Consolas, "Courier New", monospace;
+  resize: vertical;
+  min-height: 200px;
+}
+
+/* ---------- 通用列表 ---------- */
+.editor-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.editor-list-item {
+  padding: 8px 12px;
+  border: 1px solid var(--editor-border);
+  border-radius: 4px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  background: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.editor-list-item:hover {
+  border-color: var(--editor-accent);
+  background: #f8faff;
+}
+
+.editor-list-item-info {
+  flex: 1;
+  overflow: hidden;
+}
+
+.editor-list-item-name {
+  font-weight: 600;
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.editor-list-item-meta {
+  font-size: 12px;
+  color: #888;
+  margin-top: 2px;
+}
+
+/* ---------- 通用排版 ---------- */
+.editor-section-title {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 16px 0 8px;
+  color: #333;
+}
+
+.editor-form-row {
+  margin-bottom: 12px;
+}
+
+.editor-form-row label {
+  display: block;
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.editor-btn-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+/* ---------- 提示气泡 ---------- */
+.editor-toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 6px;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+  font-size: 13px;
+  max-width: 80%;
+  word-break: break-all;
+}
+
+.editor-toast.show {
+  opacity: 1;
+}

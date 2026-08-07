@@ -1,0 +1,72 @@
+/* ============================================================
+   公告创建器 - 栏目编辑页样式 (column.css)
+   依赖: all.css 中的通用类(.editor-btn / .editor-list 等)
+   ============================================================ */
+
+/* ---------- 页面容器 ---------- */
+.column-page {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 100%;
+  width: 100%;
+  overflow: auto;
+}
+
+/* ---------- 栏目设置区 ---------- */
+.column-settings {
+  background: #fff;
+  border: 1px solid var(--editor-border);
+  border-radius: 6px;
+  padding: 16px;
+}
+
+/* 设置区内标题:去掉默认上边距,与卡片内边距对齐 */
+.column-settings-title {
+  margin-top: 0;
+}
+
+/* ---------- 头图 URL 行(默认隐藏,选中"其他"时显示) ---------- */
+.column-head-url-row {
+  display: none;
+}
+
+.column-head-url-row.is-visible {
+  display: block;
+}
+
+/* ---------- 头图预览(默认隐藏,选中已知头图时显示) ---------- */
+.column-head-preview {
+  display: none;
+  margin-top: 8px;
+}
+
+.column-head-preview.is-visible {
+  display: block;
+}
+
+.column-head-preview img {
+  max-width: 200px;
+  max-height: 60px;
+  border-radius: 4px;
+  display: block;
+}
+
+/* ---------- 子标题区 ---------- */
+/* .column-subtitle-section 仅作语义容器,无额外样式 */
+
+.column-subtitle-list {
+  margin-top: 8px;
+}
+
+.column-empty-hint {
+  text-align: center;
+  color: #999;
+  padding: 30px 0;
+  font-size: 13px;
+}
+
+/* ---------- 子标题列表项 ---------- */
+/* .column-subtitle-item 复用 .editor-list-item 样式,
+   字数显示由内部 .editor-list-item-meta 承载,无需额外样式 */
