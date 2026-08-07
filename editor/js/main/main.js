@@ -147,7 +147,9 @@
     // ---- 事件绑定 ----
     addBtn.addEventListener('click', function () {
       var id = EditorApp.addColumn();
-      EditorApp.openTab('column', id);
+      if (id) {
+        EditorApp.openTab('column', id);
+      }
     });
 
     removeBtn.addEventListener('click', function () {

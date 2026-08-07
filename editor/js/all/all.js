@@ -263,6 +263,10 @@
 
   // ---------- 数据操作 ----------
   function addColumn() {
+    if (state.columns.length >= 6) {
+      showToast('最多只能添加6个栏目');
+      return null;
+    }
     var col = {
       id: genId(),
       name: '新栏目',
