@@ -279,10 +279,54 @@
     return col.id;
   }
 
-  function removeColumn() {
+  function removeColumn(columnId) {
     if (state.columns.length === 0) return;
-    state.columns.pop();
+    var idx = -1;
+    if (columnId) {
+      for (var i = 0; i < state.columns.length; i++) {
+        if (state.columns[i].id === columnId) { idx = i; break; }
+      }
+    } else {
+      idx = state.columns.length - 1;
+    }
+    if (idx === -1) return;
+    // 关闭对应栏目标签页及子标题标签页
+    var tabsToClose = [];
+    for (var t = 0; t < tabs.length; t++) {
+      if (tabs[t].type === 'column' && tabs[t].dataId === state.columns[idx].id) {
+        tabsToClose.push(tabs[t].id);
+      } else if (tabs[t].type === 'subtitle') {
+        var subCol = findSubtitleColumn(tabs[t].dataId);
+        if (subCol && subCol.id === state.columns[idx].id) {
+          tabsToClose.push(tabs[t].id);
+        }
+      }
+    }
+    state.columns.splice(idx, 1);
+    for (var j = 0; j < tabsToClose.length; j++) {
+      closeTab(tabsToClose[j]);
+    }
     refreshDisplay();
+  }
+
+  function moveColumn(columnId, direction) {
+    if (!columnId) return;
+    var idx = -1;
+    for (var i = 0; i < state.columns.length; i++) {
+      if (state.columns[i].id === columnId) { idx = i; break; }
+    }
+    if (idx === -1) return;
+    if (direction === 'up' && idx > 0) {
+      var tmpUp = state.columns[idx - 1];
+      state.columns[idx - 1] = state.columns[idx];
+      state.columns[idx] = tmpUp;
+      refreshDisplay();
+    } else if (direction === 'down' && idx < state.columns.length - 1) {
+      var tmpDown = state.columns[idx + 1];
+      state.columns[idx + 1] = state.columns[idx];
+      state.columns[idx] = tmpDown;
+      refreshDisplay();
+    }
   }
 
   function addSubtitle(columnId) {
@@ -298,12 +342,53 @@
     return sub.id;
   }
 
-  function removeSubtitle(columnId) {
+  function removeSubtitle(columnId, subtitleId) {
     var col = findColumn(columnId);
     if (!col) return;
     if (col.subtitles.length === 0) return;
-    col.subtitles.pop();
+    var idx = -1;
+    if (subtitleId) {
+      for (var i = 0; i < col.subtitles.length; i++) {
+        if (col.subtitles[i].id === subtitleId) { idx = i; break; }
+      }
+    } else {
+      idx = col.subtitles.length - 1;
+    }
+    if (idx === -1) return;
+    var removedId = col.subtitles[idx].id;
+    col.subtitles.splice(idx, 1);
+    // 关闭对应子标题标签页
+    var tabsToClose = [];
+    for (var t = 0; t < tabs.length; t++) {
+      if (tabs[t].type === 'subtitle' && tabs[t].dataId === removedId) {
+        tabsToClose.push(tabs[t].id);
+      }
+    }
+    for (var j = 0; j < tabsToClose.length; j++) {
+      closeTab(tabsToClose[j]);
+    }
     refreshDisplay();
+  }
+
+  function moveSubtitle(columnId, subtitleId, direction) {
+    var col = findColumn(columnId);
+    if (!col || !subtitleId) return;
+    var idx = -1;
+    for (var i = 0; i < col.subtitles.length; i++) {
+      if (col.subtitles[i].id === subtitleId) { idx = i; break; }
+    }
+    if (idx === -1) return;
+    if (direction === 'up' && idx > 0) {
+      var tmpUp = col.subtitles[idx - 1];
+      col.subtitles[idx - 1] = col.subtitles[idx];
+      col.subtitles[idx] = tmpUp;
+      refreshDisplay();
+    } else if (direction === 'down' && idx < col.subtitles.length - 1) {
+      var tmpDown = col.subtitles[idx + 1];
+      col.subtitles[idx + 1] = col.subtitles[idx];
+      col.subtitles[idx] = tmpDown;
+      refreshDisplay();
+    }
   }
 
   function updateColumn(columnId, updates) {
@@ -432,6 +517,14 @@
           });
         }
         state.columns = newColumns;
+        // 关闭所有非主标签页(从后往前遍历,避免索引错位)
+        for (var k = tabs.length - 1; k >= 0; k--) {
+          if (tabs[k].type !== 'main') {
+            closeTab(tabs[k].id);
+            k = tabs.length; // closeTab 会修改数组,重置索引重新遍历
+          }
+        }
+        switchTab('main');
         refreshDisplay();
         showToast('导入成功');
       } catch (err) {
@@ -584,8 +677,10 @@
     // 数据操作
     addColumn: addColumn,
     removeColumn: removeColumn,
+    moveColumn: moveColumn,
     addSubtitle: addSubtitle,
     removeSubtitle: removeSubtitle,
+    moveSubtitle: moveSubtitle,
     updateColumn: updateColumn,
     updateSubtitle: updateSubtitle,
     findColumn: findColumn,

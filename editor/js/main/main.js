@@ -9,6 +9,9 @@
 
   var EditorApp = global.EditorApp;
 
+  // 当前选中的栏目 id(主页列表单选)
+  var selectedColumnId = null;
+
   // ---------- 工具函数 ----------
   function $(id) {
     return document.getElementById(id);
@@ -40,9 +43,21 @@
       return;
     }
 
+    // 选中项已被删除时清空
+    var stillExists = false;
+    for (var c = 0; c < columns.length; c++) {
+      if (columns[c].id === selectedColumnId) { stillExists = true; break; }
+    }
+    if (!stillExists) {
+      selectedColumnId = null;
+    }
+
     for (var i = 0; i < columns.length; i++) {
       var col = columns[i];
       var item = createEl('div', 'editor-list-item');
+      if (col.id === selectedColumnId) {
+        item.className = 'editor-list-item selected';
+      }
       item.setAttribute('data-column-id', col.id);
 
       var info = createEl('div', 'editor-list-item-info');
@@ -58,7 +73,9 @@
 
       (function (columnId) {
         item.addEventListener('click', function () {
-          EditorApp.openTab('column', columnId);
+          selectedColumnId = columnId;
+          renderColumnList();
+          updateButtonStates();
         });
       })(col.id);
 
@@ -69,11 +86,27 @@
   // ---------- 按钮状态 ----------
   function updateButtonStates() {
     var removeBtn = $('main-remove-column');
-    if (!removeBtn) {
-      return;
-    }
+    var enterBtn = $('main-enter-column');
+    var upBtn = $('main-move-up');
+    var downBtn = $('main-move-down');
     var columns = (EditorApp.state && EditorApp.state.columns) || [];
-    removeBtn.disabled = columns.length === 0;
+    var hasSelection = false;
+    var selIdx = -1;
+    for (var i = 0; i < columns.length; i++) {
+      if (columns[i].id === selectedColumnId) { hasSelection = true; selIdx = i; break; }
+    }
+    if (removeBtn) {
+      removeBtn.disabled = !hasSelection;
+    }
+    if (enterBtn) {
+      enterBtn.disabled = !hasSelection;
+    }
+    if (upBtn) {
+      upBtn.disabled = !hasSelection || selIdx <= 0;
+    }
+    if (downBtn) {
+      downBtn.disabled = !hasSelection || selIdx === -1 || selIdx >= columns.length - 1;
+    }
   }
 
   // ---------- 主页渲染 ----------
@@ -119,12 +152,28 @@
     btnGroup.appendChild(previewBtn);
     btnGroup.appendChild(importInput);
 
+    // 第二行:进入 / 上移 / 下移
+    var btnRow2 = createEl('div', 'editor-btn-row');
+    var enterBtn = createEl('button', 'editor-btn', '进入');
+    enterBtn.id = 'main-enter-column';
+    enterBtn.type = 'button';
+    var upBtn = createEl('button', 'editor-btn', '上移');
+    upBtn.id = 'main-move-up';
+    upBtn.type = 'button';
+    var downBtn = createEl('button', 'editor-btn', '下移');
+    downBtn.id = 'main-move-down';
+    downBtn.type = 'button';
+    btnRow2.appendChild(enterBtn);
+    btnRow2.appendChild(upBtn);
+    btnRow2.appendChild(downBtn);
+
     var listTitle = createEl('div', 'editor-section-title', '栏目列表');
 
     var columnList = createEl('div', 'main-column-list');
     columnList.id = 'main-column-list';
 
     editArea.appendChild(btnGroup);
+    editArea.appendChild(btnRow2);
     editArea.appendChild(listTitle);
     editArea.appendChild(columnList);
 
@@ -148,12 +197,37 @@
     addBtn.addEventListener('click', function () {
       var id = EditorApp.addColumn();
       if (id) {
-        EditorApp.openTab('column', id);
+        selectedColumnId = id;
+        renderColumnList();
+        updateButtonStates();
       }
     });
 
     removeBtn.addEventListener('click', function () {
-      EditorApp.removeColumn();
+      if (!selectedColumnId) {
+        EditorApp.showToast('请先选择要删除的栏目');
+        return;
+      }
+      EditorApp.removeColumn(selectedColumnId);
+      selectedColumnId = null;
+    });
+
+    enterBtn.addEventListener('click', function () {
+      if (selectedColumnId) {
+        EditorApp.openTab('column', selectedColumnId);
+      }
+    });
+
+    upBtn.addEventListener('click', function () {
+      if (selectedColumnId) {
+        EditorApp.moveColumn(selectedColumnId, 'up');
+      }
+    });
+
+    downBtn.addEventListener('click', function () {
+      if (selectedColumnId) {
+        EditorApp.moveColumn(selectedColumnId, 'down');
+      }
     });
 
     exportBtn.addEventListener('click', function () {

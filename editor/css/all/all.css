@@ -267,6 +267,13 @@ body {
   background: #f8faff;
 }
 
+/* 选中态 */
+.editor-list-item.selected {
+  border-color: var(--editor-accent);
+  background: #e3f0ff;
+  box-shadow: 0 0 0 1px var(--editor-accent);
+}
+
 .editor-list-item-info {
   flex: 1;
   overflow: hidden;
@@ -310,6 +317,21 @@ body {
   gap: 8px;
   flex-wrap: wrap;
   margin-bottom: 12px;
+}
+
+.editor-btn-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.editor-btn-row .editor-btn {
+  margin-bottom: 0;
+}
+
+.editor-btn-row + .editor-btn-row {
+  margin-top: -4px;
 }
 
 /* ---------- 提示气泡 ---------- */

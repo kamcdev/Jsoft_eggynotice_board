@@ -30,16 +30,60 @@
     }
   }
 
+  // 读取容器上的选中子标题 id
+  function getSelectedSubId(container) {
+    return container.getAttribute('data-selected-sub-id') || null;
+  }
+
+  function setSelectedSubId(container, subId) {
+    if (subId) {
+      container.setAttribute('data-selected-sub-id', subId);
+    } else {
+      container.removeAttribute('data-selected-sub-id');
+    }
+  }
+
+  // 更新第二行按钮状态(进入/上移/下移/删除)
+  function updateSubtitleBtnStates(container, columnId) {
+    var col = EditorApp.findColumn(columnId);
+    var subs = (col && col.subtitles) ? col.subtitles : [];
+    var selId = getSelectedSubId(container);
+    var selIdx = -1;
+    for (var i = 0; i < subs.length; i++) {
+      if (subs[i].id === selId) { selIdx = i; break; }
+    }
+    var hasSel = selIdx !== -1;
+    var enterBtn = container.querySelector('.column-enter-subtitle');
+    var upBtn = container.querySelector('.column-sub-up');
+    var downBtn = container.querySelector('.column-sub-down');
+    var removeBtn = container.querySelector('.column-remove-subtitle');
+    if (enterBtn) enterBtn.disabled = !hasSel;
+    if (upBtn) upBtn.disabled = !hasSel || selIdx <= 0;
+    if (downBtn) downBtn.disabled = !hasSel || selIdx >= subs.length - 1;
+    if (removeBtn) removeBtn.disabled = !hasSel;
+  }
+
   // 渲染子标题列表(同时更新删除按钮禁用态)
   function renderSubtitleList(container, columnId) {
     var col = EditorApp.findColumn(columnId);
     var subList = container.querySelector('.column-subtitle-list');
-    var removeBtn = container.querySelector('.column-remove-subtitle');
     if (!subList) return;
 
     subList.innerHTML = '';
 
     var subs = (col && col.subtitles) ? col.subtitles : [];
+
+    // 选中项已被删除时清空
+    var selId = getSelectedSubId(container);
+    var selExists = false;
+    for (var s = 0; s < subs.length; s++) {
+      if (subs[s].id === selId) { selExists = true; break; }
+    }
+    if (!selExists) {
+      setSelectedSubId(container, null);
+      selId = null;
+    }
+
     if (subs.length === 0) {
       var hint = document.createElement('div');
       hint.className = 'column-empty-hint';
@@ -50,13 +94,15 @@
         var sub = subs[i];
         var item = document.createElement('div');
         item.className = 'editor-list-item column-subtitle-item';
+        if (sub.id === selId) {
+          item.className += ' selected';
+        }
 
         var info = document.createElement('div');
         info.className = 'editor-list-item-info';
 
         var nameEl = document.createElement('div');
         nameEl.className = 'editor-list-item-name';
-        // textContent 自动转义,安全显示子标题名称
         nameEl.textContent = sub.name || '';
 
         var metaEl = document.createElement('div');
@@ -67,21 +113,19 @@
         info.appendChild(metaEl);
         item.appendChild(info);
 
-        // 闭包锁定 subId,点击跳转到对应子标题编辑页
-        (function (subId) {
+        (function (containerRef, subId) {
           item.addEventListener('click', function () {
-            EditorApp.openTab('subtitle', subId);
+            setSelectedSubId(containerRef, subId);
+            renderSubtitleList(containerRef, columnId);
+            updateSubtitleBtnStates(containerRef, columnId);
           });
-        })(sub.id);
+        })(container, sub.id);
 
         subList.appendChild(item);
       }
     }
 
-    // 删除按钮:无子标题时禁用
-    if (removeBtn) {
-      removeBtn.disabled = subs.length === 0;
-    }
+    updateSubtitleBtnStates(container, columnId);
   }
 
   // 渲染整个栏目编辑页(仅在标签页打开时调用一次)
@@ -195,6 +239,26 @@
     btnGroup.appendChild(removeBtn);
     subSection.appendChild(btnGroup);
 
+    // 第二行:进入 / 上移 / 下移
+    var btnRow2 = document.createElement('div');
+    btnRow2.className = 'editor-btn-row';
+    var enterBtn = document.createElement('button');
+    enterBtn.type = 'button';
+    enterBtn.className = 'editor-btn column-enter-subtitle';
+    enterBtn.textContent = '进入';
+    var subUpBtn = document.createElement('button');
+    subUpBtn.type = 'button';
+    subUpBtn.className = 'editor-btn column-sub-up';
+    subUpBtn.textContent = '上移';
+    var subDownBtn = document.createElement('button');
+    subDownBtn.type = 'button';
+    subDownBtn.className = 'editor-btn column-sub-down';
+    subDownBtn.textContent = '下移';
+    btnRow2.appendChild(enterBtn);
+    btnRow2.appendChild(subUpBtn);
+    btnRow2.appendChild(subDownBtn);
+    subSection.appendChild(btnRow2);
+
     var subTitle = document.createElement('div');
     subTitle.className = 'editor-section-title';
     subTitle.textContent = '子标题列表';
@@ -238,12 +302,41 @@
     addBtn.addEventListener('click', function () {
       var subId = EditorApp.addSubtitle(columnId);
       if (subId) {
-        EditorApp.openTab('subtitle', subId);
+        setSelectedSubId(container, subId);
+        renderSubtitleList(container, columnId);
+        updateSubtitleBtnStates(container, columnId);
       }
     });
 
     removeBtn.addEventListener('click', function () {
-      EditorApp.removeSubtitle(columnId);
+      var selId = getSelectedSubId(container);
+      if (!selId) {
+        EditorApp.showToast('请先选择要删除的子标题');
+        return;
+      }
+      EditorApp.removeSubtitle(columnId, selId);
+      setSelectedSubId(container, null);
+    });
+
+    enterBtn.addEventListener('click', function () {
+      var selId = getSelectedSubId(container);
+      if (selId) {
+        EditorApp.openTab('subtitle', selId);
+      }
+    });
+
+    subUpBtn.addEventListener('click', function () {
+      var selId = getSelectedSubId(container);
+      if (selId) {
+        EditorApp.moveSubtitle(columnId, selId, 'up');
+      }
+    });
+
+    subDownBtn.addEventListener('click', function () {
+      var selId = getSelectedSubId(container);
+      if (selId) {
+        EditorApp.moveSubtitle(columnId, selId, 'down');
+      }
     });
 
     // ---- 子标题列表初次渲染 ----
