@@ -15,3 +15,4 @@ js/*
 !js/egnotice/
 js/egnotice/*
 !js/egnotice/egnotice.js
+!js/egnotice/egg-notice-convert.js
