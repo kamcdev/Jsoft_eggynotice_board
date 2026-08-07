@@ -85,6 +85,10 @@
     var page = document.createElement('div');
     page.className = 'subtitle-page';
 
+    // 左侧功能区:子标题名称 + 富文本快捷插入
+    var sideCol = document.createElement('div');
+    sideCol.className = 'subtitle-side-col';
+
     // 名称区
     var nameSection = document.createElement('div');
     nameSection.className = 'subtitle-name-section';
@@ -98,9 +102,33 @@
     nameRow.appendChild(nameLabel);
     nameRow.appendChild(nameInput);
     nameSection.appendChild(nameRow);
-    page.appendChild(nameSection);
+    sideCol.appendChild(nameSection);
 
-    // 正文编辑区
+    // 富文本面板区
+    var rtSection = document.createElement('div');
+    rtSection.className = 'subtitle-richtext-section';
+    var rtTitle = document.createElement('div');
+    rtTitle.className = 'editor-section-title';
+    rtTitle.textContent = '富文本快捷插入';
+    var grid = document.createElement('div');
+    grid.className = 'richtext-grid';
+    var rtActions = document.createElement('div');
+    rtActions.className = 'richtext-actions';
+    var insertBtn = document.createElement('button');
+    insertBtn.className = 'editor-btn editor-btn-primary richtext-insert-btn';
+    insertBtn.textContent = '生成并插入';
+    rtActions.appendChild(insertBtn);
+    rtSection.appendChild(rtTitle);
+    rtSection.appendChild(grid);
+    rtSection.appendChild(rtActions);
+    sideCol.appendChild(rtSection);
+
+    page.appendChild(sideCol);
+
+    // 右侧主区:正文编辑
+    var mainCol = document.createElement('div');
+    mainCol.className = 'subtitle-main-col';
+
     var editorSection = document.createElement('div');
     editorSection.className = 'subtitle-editor-section';
     var editorTitle = document.createElement('div');
@@ -127,26 +155,9 @@
     editorSection.appendChild(textarea);
     editorSection.appendChild(btnGroup);
     editorSection.appendChild(hint);
-    page.appendChild(editorSection);
+    mainCol.appendChild(editorSection);
 
-    // 富文本面板区
-    var rtSection = document.createElement('div');
-    rtSection.className = 'subtitle-richtext-section';
-    var rtTitle = document.createElement('div');
-    rtTitle.className = 'editor-section-title';
-    rtTitle.textContent = '富文本快捷插入';
-    var grid = document.createElement('div');
-    grid.className = 'richtext-grid';
-    var rtActions = document.createElement('div');
-    rtActions.className = 'richtext-actions';
-    var insertBtn = document.createElement('button');
-    insertBtn.className = 'editor-btn editor-btn-primary richtext-insert-btn';
-    insertBtn.textContent = '生成并插入';
-    rtActions.appendChild(insertBtn);
-    rtSection.appendChild(rtTitle);
-    rtSection.appendChild(grid);
-    rtSection.appendChild(rtActions);
-    page.appendChild(rtSection);
+    page.appendChild(mainCol);
 
     container.appendChild(page);
 
@@ -157,6 +168,8 @@
       var err = document.createElement('div');
       err.className = 'subtitle-page';
       err.style.color = '#888';
+      err.style.display = 'block';
+      err.style.overflow = 'auto';
       err.textContent = '未找到该子标题，可能已被删除。';
       container.appendChild(err);
       return;
