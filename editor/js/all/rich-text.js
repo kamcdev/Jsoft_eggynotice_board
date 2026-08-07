@@ -15,6 +15,7 @@
     { id: 'shadow', name: '投影', params: [{ name: '颜色', type: 'color' }, { name: '偏移', type: 'number' }], format: 'y:{颜色}|Y:{偏移}', end: false, image: false },
     { id: 'strike', name: '中划线', params: [{ name: '颜色', type: 'color' }], format: 'h:{颜色}', end: false, image: false },
     { id: 'underline', name: '下划线', params: [{ name: '颜色', type: 'color' }], format: 'u:{颜色}', end: false, image: false },
+    { id: 'link', name: '超链接', params: [], format: 'e:url_0|i:link_inner', end: false, image: false },
     { id: 'end', name: '结束富文本', params: [], format: '#l', end: true, image: false },
     { id: 'image', name: '插入图片', params: [{ name: 'url', type: 'text' }, { name: '大小', type: 'number' }], format: '#p(f:{url}|s:{大小})', end: false, image: true }
   ];
@@ -83,7 +84,9 @@
       }
       if (!parts.length) return '';
 
-      return '#f(' + parts.join('|') + ')文字';
+      // 含超链接样式时占位符为"链接url",否则为"文字"
+      var placeholder = filtered.indexOf('link') !== -1 ? '链接url' : '文字';
+      return '#f(' + parts.join('|') + ')' + placeholder;
     },
 
     // 统计去掉富文本标记后的净字数

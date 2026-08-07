@@ -360,10 +360,18 @@
       textarea.value = textarea.value.substring(0, start) + generated + textarea.value.substring(end);
       textarea.focus();
 
-      var phIdx = generated.indexOf('文字');
+      var phText = '';
+      var phIdx = -1;
+      if (generated.indexOf('链接url') !== -1) {
+        phText = '链接url';
+        phIdx = generated.indexOf('链接url');
+      } else if (generated.indexOf('文字') !== -1) {
+        phText = '文字';
+        phIdx = generated.indexOf('文字');
+      }
       if (phIdx !== -1) {
         textarea.selectionStart = start + phIdx;
-        textarea.selectionEnd = start + phIdx + 2;
+        textarea.selectionEnd = start + phIdx + phText.length;
       } else {
         textarea.selectionStart = textarea.selectionEnd = start + generated.length;
       }
