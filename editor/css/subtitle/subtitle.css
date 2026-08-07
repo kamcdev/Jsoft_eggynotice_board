@@ -40,8 +40,9 @@
     flex-shrink: 0;
   }
   .subtitle-main-col {
-    flex: 1;
-    min-height: 300px;
+    flex: 1 0 auto;
+    min-height: 60vh;
+    height: 60vh;
   }
 }
 
