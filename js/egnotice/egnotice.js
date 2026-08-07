@@ -104,10 +104,6 @@
     ];
   }
 
-  function isUrl(text) {
-    return /^(https?:\/\/|www\.)/i.test(text.trim());
-  }
-
   function applyStyles(el, params, parentColor) {
     var color = params.c ? parseColor(params.c) : parentColor;
     el.style.color = color;
@@ -150,7 +146,7 @@
     var color = params.c ? parseColor(params.c) : parentColor;
 
     var el;
-    if (isUrl(innerText)) {
+    if (params.e) {
       el = document.createElement('a');
       el.className = 'egnotice-link';
       el.href = innerText.trim();
