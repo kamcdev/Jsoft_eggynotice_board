@@ -1,0 +1,317 @@
+
+
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+
+@font-face {
+  font-family: 'egnotice-font-title';
+  src: url(hkxzyt_w9_gb.ttf) format('truetype');
+  font-weight: 700;
+  font-display: swap;
+}
+
+
+@font-face {
+  font-family: 'egnotice-font-yuan';
+  src: url(huawenyuanti-bold-2.ttf) format('truetype');
+  font-weight: 700;
+  font-display: swap;
+}
+
+
+.egnotice-title-font {
+  font-family: 'egnotice-font-title', 'egnotice-font-yuan', 'Microsoft YaHei', 'PingFang SC', sans-serif;
+}
+.egnotice-yuan-font {
+  font-family: 'egnotice-font-yuan', 'Microsoft YaHei', 'PingFang SC', sans-serif;
+}
+
+
+.egnotice-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5); 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  
+  text-align: left;
+  
+  overflow: auto;
+}
+
+.egnotice-overlay.hidden {
+  display: none;
+}
+
+
+.egnotice-dialog {
+  position: relative;
+  width: 770px;
+  height: 440px;
+  flex-shrink: 0; 
+  
+  transform: scale(var(--egnotice-scale, 1));
+  transform-origin: center center;
+}
+
+
+.egnotice-bg {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 730px;
+  height: 400px;
+  background: url(img_notice_bg.png) no-repeat center / contain;
+}
+
+
+.egnotice-main-title {
+  position: absolute;
+  top: 40px; 
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: #FFFFFF;
+  font-size: 24px;
+  font-family: 'egnotice-font-title', 'egnotice-font-yuan', 'Microsoft YaHei', 'PingFang SC', sans-serif;
+  font-weight: 700;
+  padding: 15px 0 12px; 
+  
+  text-shadow:
+    2px 0 0 #ff8914, -2px 0 0 #ff8914,
+    0 2px 0 #ff8914, 0 -2px 0 #ff8914,
+    1.5px 1.5px 0 #ff8914, -1.5px 1.5px 0 #ff8914,
+    1.5px -1.5px 0 #ff8914, -1.5px -1.5px 0 #ff8914;
+  white-space: normal; 
+  overflow: visible;
+}
+
+
+.egnotice-body {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: row;
+  padding: 120px 115px 60px 32px; 
+}
+
+
+.egnotice-tabs {
+  width: 140px;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center; 
+  margin: 8px 0 0 -20px;
+}
+
+
+.egnotice-tab {
+  width: 125px;
+  aspect-ratio: 324 / 106; 
+  position: relative;
+  cursor: pointer;
+  text-align: center;
+  margin: 0 0 4px -1px; 
+}
+
+.egnotice-tab.active {
+  background: url(notice_btn_tab.png) no-repeat center / 100% 100%;
+}
+
+
+.egnotice-tab-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px; 
+  color: #302E10; 
+  font-family: 'egnotice-font-title', 'egnotice-font-yuan', 'Microsoft YaHei', sans-serif;
+  font-weight: 700;
+  line-height: 1.2;
+  transform: translateX(18px);
+}
+
+
+.egnotice-tab.active .egnotice-tab-text {
+  font-size: 15px;
+}
+
+
+.egnotice-divider {
+  width: 70px;
+  height: 3px;
+  background: url(img_notice_line.png) no-repeat center / 100% 100%;
+  margin: -6px 0 3px 32px; 
+}
+
+
+.egnotice-panel {
+  flex: 1;
+  position: relative;
+  margin-top: -19px; 
+  min-width: 0;
+}
+
+
+.egnotice-scroll {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  padding: 0 15px 0 5px;
+  margin-right: 10px;
+  scrollbar-width: none;
+}
+
+.egnotice-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+
+.egnotice-scrollbar {
+  position: absolute;
+  right: 3px; 
+  top: 19px; 
+  bottom: 64px; 
+  width: 4px;
+  background: url(img_notice_bg_bar.png) no-repeat center / 3px 100%; 
+}
+
+.egnotice-scrollbar-thumb {
+  position: absolute;
+  left: 0;
+  top: 0; 
+  width: 4px;
+  height: 24px; 
+  border-radius: 2px; 
+  background: #ff8914; 
+}
+
+
+.egnotice-close {
+  position: absolute;
+  top: 41px; 
+  right: 76px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  background: transparent url(img_btn_close.png) no-repeat center / 100% 100%;
+  cursor: pointer;
+}
+
+
+.egnotice-cat-section {
+  margin-bottom: 16px;
+}
+
+
+.egnotice-cat-head {
+  position: relative;
+  margin: 16px 0 5px; 
+}
+
+.egnotice-cat-head-bg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.egnotice-cat-head-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ef5a09;
+  font-size: 27px;
+  font-family: 'egnotice-font-title', 'egnotice-font-yuan', 'Microsoft YaHei', sans-serif;
+  font-weight: 700;
+  
+  text-shadow:
+    3px 0 0 #FFFFFF, -3px 0 0 #FFFFFF,
+    0 3px 0 #FFFFFF, 0 -3px 0 #FFFFFF,
+    2px 2px 0 #FFFFFF, -2px 2px 0 #FFFFFF,
+    2px -2px 0 #FFFFFF, -2px -2px 0 #FFFFFF;
+  white-space: normal; 
+  overflow: visible;
+}
+
+
+.egnotice-cat-title-plain {
+  font-size: 16px;
+  font-weight: 700;
+  color: #000000;
+  padding: 8px 0;
+  text-align: left;
+  font-family: 'egnotice-font-yuan', 'Microsoft YaHei', sans-serif;
+}
+
+
+.egnotice-subtitle {
+  position: relative;
+  height: 30px;
+}
+
+.egnotice-subtitle-bg {
+  position: absolute;
+  left: 5px; 
+  top: 0;
+  height: 30px;
+  width: auto;
+  max-width: 100%;
+}
+
+.egnotice-subtitle-text {
+  position: absolute;
+  inset: 0;
+  padding: 9px 16px 8px 17px; 
+  color: #FFFFFF;
+  font-size: 14px;
+  font-family: 'egnotice-font-yuan', 'Microsoft YaHei', sans-serif;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: left;
+  
+  text-shadow:
+    2px 0 0 #ff6825, -2px 0 0 #ff6825,
+    0 2px 0 #ff6825, 0 -2px 0 #ff6825,
+    1.5px 1.5px 0 #ff6825, -1.5px 1.5px 0 #ff6825,
+    1.5px -1.5px 0 #ff6825, -1.5px -1.5px 0 #ff6825;
+  white-space: normal; 
+  overflow: visible;
+}
+
+
+.egnotice-paragraph {
+  font-size: 13px;
+  color: #000000;
+  line-height: 20px; 
+  white-space: pre-line;
+  word-break: break-word;
+  text-align: left;
+  font-family: 'egnotice-font-yuan', 'Microsoft YaHei', sans-serif;
+  font-weight: 700;
+  padding: 4px 16px 12px 12px; 
+}
+
+.egnotice-paragraph-main {
+  padding-left: 5px; 
+}
+
+
+.egnotice-link {
+  text-decoration: underline;
+  cursor: pointer;
+  word-break: break-all;
+}

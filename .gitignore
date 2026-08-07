@@ -1,0 +1,17 @@
+.trae/
+.vscode/
+.idea/
+*.iml
+.DS_Store
+Thumbs.db
+
+.backup/
+
+参考/
+
+index.html
+
+js/*
+!js/egnotice/
+js/egnotice/*
+!js/egnotice/egnotice.js

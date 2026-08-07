@@ -1,0 +1,191 @@
+### Jsoft_eggynotice_board
+
+###### ©2026 Eggy Notice Project
+
+------
+
+<img src="https://img.shields.io/badge/HTML-5-orange">
+
+<img src="https://img.shields.io/badge/CSS-3-blue">
+
+<img src="https://img.shields.io/badge/JavaScript-ES5-yellow">
+
+------
+
+目录
+* [介绍](#介绍)
+* [部署](#部署)
+    * [获取项目文件](#获取项目文件)
+    * [启动演示](#启动演示)
+    * [集成到你的页面](#集成到你的页面)
+* [数据格式](#数据格式)
+* [API参考](#api参考)
+* [结语](#结语)
+
+<p id="介绍"></p>
+
+------
+
+# 介绍
+
+这是还原《蛋仔派对》游戏公告板的h5组件
+
+纯前端实现，无任何第三方依赖，还原游戏内公告板界面与交互
+
+支持多分类页签、滚动联动、自定义滚动条、富文本颜色与链接、屏幕缩放适配
+
+<p id="部署"></p>
+
+------
+
+# 部署
+
+<p id="获取项目文件"></p>
+
+1.获取项目文件
+
+使用git工具命令
+
+```
+git clone https://github.com/kamcdev/Jsoft_eggynotice_board.git
+```
+
+或
+
+直接下载压缩包并解压
+
+<p id="启动演示"></p>
+
+2.启动演示
+
+本项目为纯静态页面，且公告数据通过 `fetch` 加载，因此**不要直接双击 index.html 用 file:// 协议打开**（浏览器会拦截本地 JSON 请求）
+
+建议使用任意静态服务器，例如 Python：
+
+```
+python -m http.server 8080
+```
+
+启动后在浏览器输入[http://127.0.0.1:8080/index.html](http://127.0.0.1:8080/index.html)
+
+页面加载后会自动弹出示例公告板，可点击"打开公告板"重新打开，或点击"加载网易接口数据"拉取游戏线上公告
+
+也可将本目录部署到任意静态托管（Nginx、GitHub Pages 等）
+
+<p id="集成到你的页面"></p>
+
+3.集成到你的页面
+
+在你的 HTML 中引入样式与脚本：
+
+```html
+<link rel="stylesheet" href="css/egnotice/egnotice.css">
+<script src="js/egnotice/egnotice.js"></script>
+<script src="js/egnotice/egg-notice-convert.js"></script>
+```
+
+引入后即可通过全局对象 `EgNotice` 打开公告板：
+
+```js
+// 方式一：从公告数据 JSON 文件加载并弹出（返回 Promise）
+EgNotice.open('js/egnotice/sample-data.json');
+
+// 方式二：直接传入数据数组渲染
+EgNotice.render([
+  {
+    title: '维护公告',
+    content: ['这是第一条公告内容']
+  }
+]);
+
+// 方式三：初始化并配置 url，页面加载后自动弹出
+EgNotice.init({ url: 'js/egnotice/sample-data.json' });
+
+// 方式四：加载网易原版线上公告（转换后以 blob URL 显示）
+EgNoticeEgg.load().then(function (blobUrl) {
+  return EgNotice.open(blobUrl);
+});
+```
+
+<p id="数据格式"></p>
+
+------
+
+# 数据格式
+
+公告数据为一个 JSON 数组，每个元素是一个公告分类：
+
+```json
+[
+  {
+    "title": "维护公告",
+    "title_bg_path": "img_notice_title1.png",
+    "content": [
+      "普通段落文字",
+      "带颜色文字 #cff8914橙色",
+      "查看详情 #f(c:00aaff)https://example.com#l",
+      "子标题文字#image#img_play_pic.png"
+    ]
+  }
+]
+```
+
+字段说明：
+
+| 字段 | 说明 |
+|------|------|
+| `title` | 分类标题，同时作为左侧页签文字 |
+| `title_bg_path` | 分类标题背景图片路径（可省略，省略时显示纯文字标题） |
+| `content` | 内容块数组，每个元素为一个段落或子标题块 |
+
+content 中的富文本标记：
+
+| 标记 | 说明 |
+|------|------|
+| `#cRRGGBB` | 将其后的文字渲染为该颜色，如 `#cff8914橙色` |
+| `#f(c:RRGGBB)文字#l` | 渲染为可点击的链接（跳转文字本身），可指定链接颜色 |
+| `文字#image#图片路径` | 带背景图片的子标题块，`#image#` 前为子标题文字，后为图片路径 |
+
+图片路径默认相对于 `css/egnotice/`（可通过配置项 `assetsBase` 修改），也支持绝对路径（以 `/` 开头、`http(s)://`、`blob:`、`data:` 开头）
+
+若数据首条无 `title_bg_path`，组件会将其视为引导块，自动合并到第二条数据前并移除（用于适配网易原版公告格式）
+
+<p id="api参考"></p>
+
+------
+
+# API参考
+
+`EgNotice` 全局对象提供以下方法：
+
+| 方法 | 说明 |
+|------|------|
+| `EgNotice.open(url, options?)` | 从 JSON 文件路径加载公告并弹出，返回 Promise |
+| `EgNotice.render(data, options?)` | 直接传入公告数据数组渲染并弹出 |
+| `EgNotice.init(options?)` | 初始化配置，设置 `url` 且 `autoOpen` 不为 false 时自动弹出 |
+| `EgNotice.close()` | 关闭公告板 |
+
+配置项（options）：
+
+| 配置 | 默认值 | 说明 |
+|------|--------|------|
+| `assetsBase` | `'css/egnotice/'` | 图片等资源的相对路径基准 |
+| `firstTabTitle` | `'维护公告'` | 首个页签无标题时的兜底文字 |
+| `mainTitle` | `''` | 顶部主标题，为空时使用首条数据标题 |
+| `autoOpen` | `true` | init 配置了 url 时是否自动打开 |
+| `onClose` | `null` | 关闭公告板时的回调函数 |
+
+`EgNoticeEgg` 全局对象（网易数据转换器，可选引入）：
+
+| 成员 | 说明 |
+|------|------|
+| `EgNoticeEgg.load(url?)` | 拉取网易原版公告并转换为 blob URL，返回 Promise；不传 url 时使用默认地址 |
+| `EgNoticeEgg.DEFAULT_URL` | 默认数据地址（`https://u5.update.netease.com/game_notice/android.txt`） |
+
+<p id="结语"></p>
+
+------
+
+# 结语
+
+本readme由ai生成
